@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     </head>
     <body>
-    @include('sweetalert::alert')
-    @yield('content')
+        @include('sweetalert::alert')
+        @yield('content')
     </body>
 </html>

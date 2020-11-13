@@ -1,12 +1,12 @@
 @extends('content')
 @section('userindex')
 
-    <h2>Users list</h2>
+    <h2>{{ trans('trans.user_list') }}</h2>
 
     <form action="{{ route('user.create') }}" method="get">
       <button class="btn btn-primary actionuser" type="submit">{{ trans('trans.add_user') }}</button>
     </form>
-    
+
     <table class="table table-hover">
         <thead>
             <tr>
