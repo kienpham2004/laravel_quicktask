@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Model;
+use App\User;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class UserController extends Controller
 {
@@ -13,7 +16,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view("layouts.app");
+        $users =  User::all();
+
+        return view('userindex', compact('users'));
     }
 
     /**
@@ -23,7 +28,7 @@ class UserController extends Controller
      */
     public function create()
     {
-    
+        return view('usercreate');
     }
 
     /**
@@ -34,7 +39,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = User::create($request->all());
+        
+        if ($user){
+            alert()->success(trans('trans.success'), trans('trans.suc_add'));
+        } else {
+            alert()->error( trans('trans.fail'), trans('trans.ses_createfail'));
+        }
+
+        return redirect()->route('user.index');
     }
 
     /**
@@ -56,7 +69,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        return view('useredit', compact('user'));
     }
 
     /**
@@ -68,7 +83,13 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $user->name = $request->name;
+        $user->password = $request->password;
+        $user->save();
+        alert()->success(trans('trans.success'), trans('trans.suc_update'));
+        return redirect()->route("user.index");
     }
 
     /**
@@ -79,6 +100,16 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $user->delete();
+        alert()->warning(trans('trans.success'), trans('trans.suc_delete'));
+        return back();
     }
+
+    public function back(){
+        
+        return redirect()->route("user.index");
+    }
+
 }
