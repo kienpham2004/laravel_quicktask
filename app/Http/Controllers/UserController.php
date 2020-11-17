@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
+use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\EditUserRequest;
 
 class UserController extends Controller
 {
@@ -13,7 +16,9 @@ class UserController extends Controller
      */
     public function index()
     {
-  
+        $users =  User::all();
+
+        return view('list_user', compact('users'));
     }
 
     /**
@@ -23,7 +28,7 @@ class UserController extends Controller
      */
     public function create()
     {
-    
+        return view('create_user');
     }
 
     /**
@@ -32,9 +37,17 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateUserRequest $request)
     {
-        //
+        $user = User::create($request->all());
+        
+        if ($user) {
+            alert()->success(trans('mes_user.alert_success'), trans('mes_user.alert_add'));
+        } else {
+            alert()->error(trans('mes_user.alert_fail'), trans('mes_user.alert_fail'));
+        }
+
+        return redirect()->route('user.index');
     }
 
     /**
@@ -56,7 +69,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        return view('edit_user', compact('user'));
     }
 
     /**
@@ -66,9 +81,17 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditUserRequest $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'name' => $request->name,
+            'password' => bcrypt($request->password)
+        ]);
+        alert()->success(trans('mes_user.alert_success'), trans('mes_user.alert_update'));
+        
+        return redirect()->route('user.index');
     }
 
     /**
@@ -79,6 +102,16 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $user->delete();
+        alert()->warning(trans('mes_user.alert_success'), trans('mes_user.alert_delete'));
+
+        return back();
+    }
+
+    public function back()
+    {
+        return redirect()->route('user.index');
     }
 }
