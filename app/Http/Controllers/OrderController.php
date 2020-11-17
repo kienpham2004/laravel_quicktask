@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Order;
+use App\Http\Requests\CreateOrderRequest;
+use App\Http\Requests\EditOrderRequest;
 
 class OrderController extends Controller
 {
@@ -13,7 +16,9 @@ class OrderController extends Controller
      */
     public function index()
     {
-       
+        $orders = Order::all();
+
+        return view('list_order', compact('orders'));
     }
 
     /**
@@ -23,7 +28,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-      
+        return view('create_order');
     }
 
     /**
@@ -32,9 +37,17 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateOrderRequest $request)
     {
-        //
+        $order = Order::create($request->all());
+
+        if ($order) {
+            alert()->success(trans('mes_order.success'), trans('mes_order.suc_add'));
+        } else {
+            alert()->error(trans('mes_order.fail'), trans('mes_order.ses_createfail'));
+        }
+
+        return redirect()->route('order.index');
     }
 
     /**
@@ -56,7 +69,9 @@ class OrderController extends Controller
      */
     public function edit($id)
     {
-        //
+        $order = Order::findOrFail($id);
+
+        return view('edit_order', compact('order'));
     }
 
     /**
@@ -66,9 +81,17 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditOrderRequest $request, $id)
     {
-        //
+        $order = Order::findOrFail($id);
+
+        $order->update([
+            'order_name' => $request->order_name,
+        ]);
+
+        alert()->success(trans('mes_order.success'), trans('mes_order.suc_update'));
+
+        return redirect()->route("order.index");
     }
 
     /**
@@ -79,6 +102,16 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $order = Order::findOrFail($id);
+   
+        $order->delete();
+        alert()->warning(trans('mes_order.success'), trans('mes_order.suc_delete'));
+
+        return back();
+    }
+
+    public function back()
+    {
+        return redirect()->route('order.index');
     }
 }
